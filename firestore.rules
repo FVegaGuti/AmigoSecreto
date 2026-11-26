@@ -1,0 +1,31 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    // Mismo UID que ADMIN_UIDS en firebase-config.js
+    function isAdmin() { return signedIn() && request.auth.uid in ['hD8iVlxEvrOfkEuynegBBdOnuKx2']; }
+
+    // Cada persona escribe solo su propia lista; todos los que entraron pueden leerlas.
+    match /participantes/{uid} {
+      allow read: if signedIn();
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['nombre', 'regalos', 'actualizado'])
+        && request.resource.data.nombre is string && request.resource.data.nombre.size() <= 40
+        && request.resource.data.regalos is list && request.resource.data.regalos.size() <= 30;
+      allow delete: if signedIn() && (request.auth.uid == uid || isAdmin());
+    }
+
+    // Fecha, presupuesto y estado del sorteo: todos leen, solo el organizador escribe.
+    match /config/{id} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    // A quién le regala cada uno: cada persona lee solo la suya.
+    match /sorteo/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow write: if isAdmin();
+    }
+  }
+}

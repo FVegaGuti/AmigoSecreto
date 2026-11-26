@@ -1,0 +1,949 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Amigo Secreto Familiar</title>
+<meta name="description" content="Nuestro amigo secreto de Navidad: cada uno escribe su lista de regalos y el sorteo dice a quién le regalas.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='10' y='38' width='80' height='54' rx='6' fill='%231C4A3D'/><rect x='5' y='26' width='90' height='18' rx='4' fill='%23235746'/><rect x='44' y='26' width='12' height='66' fill='%23CF2A3F'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: a wrapping-paper hero with a hanging gift tag as the title; below, one column of views (my list, my draw, the family, organize). Every gift is a notched gift tag. */
+:root {
+  --bg: #F3F7F3;
+  --surface: #FFFFFF;
+  --ink: #15302A;
+  --muted: #5B6F68;
+  --line: #D5E0D9;
+  --pine: #1C4A3D;
+  --pine-2: #235746;
+  --ribbon: #CF2A3F;
+  --ribbon-ink: #FFFFFF;
+  --gold: #B88A12;
+  --soft: #E8F0EA;
+  --danger: #B3261E;
+  --ok: #2F7A4D;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Instrument Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E1A17; --surface: #16261F; --ink: #E6EFE9; --muted: #9DB2A9; --line: #2A3F37;
+    --pine: #133A2F; --pine-2: #18463A; --ribbon: #F0566A; --ribbon-ink: #1A0B0E; --gold: #E0BC52;
+    --soft: #1C3029; --danger: #FF8A80; --ok: #7BD39A; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1A17; --surface: #16261F; --ink: #E6EFE9; --muted: #9DB2A9; --line: #2A3F37;
+  --pine: #133A2F; --pine-2: #18463A; --ribbon: #F0566A; --ribbon-ink: #1A0B0E; --gold: #E0BC52;
+  --soft: #1C3029; --danger: #FF8A80; --ok: #7BD39A; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+img { max-width: 100%; }
+:root {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--bg);
+}
+.authbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: .6rem; padding-top: .9rem; font-size: .92rem; color: var(--muted); }
+.authbar img { width: 28px; height: 28px; border-radius: 50%; }
+.login { display: grid; gap: .9rem; justify-items: start; max-width: 60ch; }
+.btn-google {
+  display: inline-flex; align-items: center; gap: .65rem; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  border-radius: 999px; padding: .7rem 1.2rem; font-weight: 600; cursor: pointer;
+}
+.btn-google:hover { background: var(--soft); }
+.btn-google svg { width: 20px; height: 20px; flex: none; }
+code.uid { font-size: .85rem; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: .3rem .5rem; overflow-wrap: anywhere; }
+body {
+  margin: 0;
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.45;
+  font-feature-settings: "kern" 1; text-rendering: optimizeLegibility;
+}
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.1; }
+p { margin: 0; }
+button, input, textarea, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+.wrap {
+  max-width: 980px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* ---------- hero: wrapping paper + ribbon + tag ---------- */
+.hero {
+  position: relative; overflow: hidden;
+  padding-top: 3.2rem;
+  padding-bottom: 2.75rem;
+  color: #F3F7F3;
+  background:
+    radial-gradient(circle at 12px 12px, rgba(255,255,255,.13) 2.2px, transparent 2.6px) 0 0 / 34px 34px,
+    repeating-linear-gradient(135deg, var(--pine) 0 22px, var(--pine-2) 22px 44px);
+}
+.hero::before, .hero::after { content: ""; position: absolute; background: var(--ribbon); pointer-events: none; }
+.hero::before { top: 0; bottom: 0; right: 18%; width: 26px; }
+.hero::after { left: 0; right: 0; top: 62%; height: 26px; }
+.hero .wrap { position: relative; z-index: 2; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1.5rem 2rem; align-items: center; }
+@media (max-width: 700px) { .hero-grid { grid-template-columns: 1fr; } }
+#snow { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+
+/* string of lights across the top of the hero */
+.lights {
+  position: absolute; top: 0; left: 0; right: 0; height: 40px; z-index: 3; pointer-events: none;
+  display: flex; justify-content: space-around; overflow: hidden;
+  background: radial-gradient(ellipse 60px 14px at 30px 0, transparent 12px, #0B1C16 13px, #0B1C16 14.5px, transparent 15.5px) 0 0 / 60px 40px repeat-x;
+}
+.lights i {
+  display: block; width: 11px; height: 17px; margin-top: 10px; border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+  background: var(--c); box-shadow: 0 0 10px 2px var(--c); position: relative; flex: none;
+  animation: twinkle 1.8s ease-in-out infinite; animation-delay: var(--d);
+}
+.lights i::before { content: ""; position: absolute; top: -4px; left: 2px; width: 7px; height: 5px; background: #2E3B36; border-radius: 2px; }
+@keyframes twinkle { 50% { opacity: .35; box-shadow: 0 0 2px 0 var(--c); } }
+
+/* the photo of the season */
+.polaroid {
+  margin: 0; background: #FBFCF8; padding: .6rem .6rem 0; transform: rotate(3deg);
+  box-shadow: 0 14px 30px rgba(0,0,0,.3); width: min(280px, 100%); justify-self: center; position: relative;
+}
+.polaroid::before {
+  content: ""; position: absolute; top: -12px; left: 50%; width: 90px; height: 24px; margin-left: -45px;
+  background: color-mix(in srgb, var(--ribbon) 70%, transparent); transform: rotate(-4deg);
+}
+.polaroid img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
+.polaroid figcaption { font-family: var(--font-display); font-weight: 600; color: #15302A; text-align: center; padding: .55rem .2rem .7rem; font-size: 1rem; }
+@media (max-width: 700px) { .polaroid { width: min(220px, 70%); } }
+
+/* cats in empty states */
+.cat-note { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 1.2rem; align-items: center; }
+.cat-note img { width: 140px; height: 140px; object-fit: cover; border-radius: 12px; border: 4px solid var(--surface); box-shadow: 0 0 0 1px var(--line), 0 8px 18px rgba(0,0,0,.12); }
+.cat-note > div { display: grid; gap: .35rem; min-width: 0; }
+@media (max-width: 480px) { .cat-note { grid-template-columns: 1fr; } .cat-note img { width: 120px; height: 120px; } }
+.reveal-top { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; }
+.reveal-top img { width: 150px; height: 150px; object-fit: cover; border-radius: 50%; border: 5px solid var(--ribbon); }
+
+@media (prefers-reduced-motion: reduce) { .lights i { animation: none; } #snow { display: none; } }
+.tag-hero {
+  position: relative; display: inline-flex; flex-direction: column; gap: .35rem;
+  background: #FBFCF8; color: #15302A;
+  padding: 1.4rem 1.8rem 1.4rem 3.2rem; max-width: 100%;
+  clip-path: polygon(26px 0, 100% 0, 100% 100%, 26px 100%, 0 calc(100% - 26px), 0 26px);
+  transform: rotate(-2deg); transform-origin: left center;
+  box-shadow: 0 14px 30px rgba(0,0,0,.25);
+}
+.tag-hero::before {
+  content: ""; position: absolute; left: 16px; top: 50%; width: 14px; height: 14px; margin-top: -7px;
+  border-radius: 50%; background: var(--pine); box-shadow: inset 0 0 0 3px #D9DFD3;
+}
+.tag-hero h1 { font-size: clamp(2.2rem, 7vw, 4rem); font-weight: 800; letter-spacing: -.02em; }
+.tag-hero .sub { font-family: var(--font-display); font-weight: 500; font-size: clamp(1.05rem, 2.6vw, 1.35rem); color: #3F5850; }
+.hero-meta { margin-top: 1.6rem; display: flex; flex-wrap: wrap; gap: .5rem; }
+.chip-dark {
+  background: rgba(10, 25, 20, .55); color: #F3F7F3; border: 1px solid rgba(255,255,255,.18);
+  border-radius: 999px; padding: .35rem .85rem; font-size: .92rem; backdrop-filter: blur(4px);
+}
+.chip-dark strong { font-weight: 600; }
+
+/* ---------- nav ---------- */
+nav.tabs { display: flex; gap: .25rem; flex-wrap: wrap; margin-top: 1.5rem; border-bottom: 1px solid var(--line); }
+nav.tabs a {
+  text-decoration: none; color: var(--muted); font-weight: 600; padding: .7rem .9rem; border-bottom: 3px solid transparent;
+  margin-bottom: -1px; border-radius: 6px 6px 0 0;
+}
+nav.tabs a:hover { color: var(--ink); background: var(--soft); }
+nav.tabs a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--ribbon); }
+
+main { padding-block: 1.75rem 4rem; }
+.view { display: grid; gap: 1.5rem; }
+.lead { color: var(--muted); max-width: 62ch; }
+.view > header { display: grid; gap: .45rem; }
+.view > header h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 700; }
+
+.notice {
+  border: 1px solid var(--line); background: var(--surface); border-radius: var(--r);
+  padding: 1rem 1.15rem; display: grid; gap: .35rem; max-width: 70ch;
+}
+.notice strong { font-family: var(--font-display); font-size: 1.1rem; }
+
+/* ---------- forms ---------- */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 1.25rem; display: grid; gap: 1rem; }
+.panel h3 { font-size: 1.2rem; font-weight: 700; }
+.field { display: grid; gap: .35rem; min-width: 0; }
+.field label, .legend { font-weight: 600; font-size: .95rem; }
+.hint { color: var(--muted); font-size: .88rem; }
+input[type="text"], input[type="url"], input[type="date"], textarea {
+  width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: .65rem .75rem;
+}
+textarea { min-height: 5.2rem; resize: vertical; }
+input:focus, textarea:focus { border-color: var(--pine-2); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 640px) { .row2 { grid-template-columns: 1fr; } }
+
+.choices { display: flex; flex-wrap: wrap; gap: .4rem; border: 0; padding: 0; margin: 0; }
+.choices legend { margin-bottom: .45rem; padding: 0; }
+.choice input { position: absolute; opacity: 0; pointer-events: none; }
+.choice span {
+  display: inline-block; padding: .38rem .8rem; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--bg); cursor: pointer; font-size: .93rem;
+}
+.choice input:checked + span { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.choice input:focus-visible + span { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+.actions { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; }
+.btn {
+  border: 0; border-radius: 999px; padding: .7rem 1.2rem; font-weight: 600; cursor: pointer;
+  background: var(--ribbon); color: var(--ribbon-ink);
+}
+.btn:hover { filter: brightness(1.06); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn.ghost:hover { background: var(--soft); }
+.btn.small { padding: .4rem .8rem; font-size: .88rem; }
+.btn.danger { background: var(--danger); color: var(--surface); }
+.status { font-size: .9rem; color: var(--muted); min-height: 1.3em; }
+.status.err { color: var(--danger); }
+.status.ok { color: var(--ok); }
+
+/* ---------- gift tags ---------- */
+.tags { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+.gift {
+  position: relative; background: var(--surface); min-width: 0;
+  padding: 1rem 1.1rem 1rem 2.4rem; display: grid; gap: .5rem; align-content: start;
+  clip-path: polygon(18px 0, 100% 0, 100% 100%, 18px 100%, 0 calc(100% - 18px), 0 18px);
+  border-right: 1px solid var(--line);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.gift::before {
+  content: ""; position: absolute; left: 12px; top: 1.35rem; width: 11px; height: 11px;
+  border-radius: 50%; background: var(--bg); box-shadow: inset 0 0 0 2px var(--line);
+}
+.gift h4 { margin: 0; font-family: var(--font-display); font-size: 1.12rem; font-weight: 700; overflow-wrap: anywhere; }
+.gift .meta { display: flex; flex-wrap: wrap; gap: .35rem; }
+.pill { font-size: .8rem; padding: .15rem .55rem; border-radius: 999px; background: var(--soft); color: var(--ink); }
+.pill.p3 { background: var(--ribbon); color: var(--ribbon-ink); }
+.pill.p2 { background: color-mix(in srgb, var(--gold) 22%, var(--surface)); color: var(--ink); box-shadow: inset 0 0 0 1px var(--gold); }
+.gift .note { color: var(--ink); font-size: .95rem; overflow-wrap: anywhere; white-space: pre-line; }
+.gift .note::before { content: "“"; color: var(--muted); }
+.gift .note::after { content: "”"; color: var(--muted); }
+.gift a.link { color: var(--pine-2); font-size: .9rem; overflow-wrap: anywhere; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+:root[data-theme="dark"] .gift a.link { color: var(--gold); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .gift a.link { color: var(--gold); } }
+.gift .tools { display: flex; gap: .4rem; margin-top: .2rem; }
+.empty {
+  border: 1.5px dashed var(--line); border-radius: 14px; padding: 1.5rem; color: var(--muted); display: grid; gap: .3rem;
+}
+.empty strong { color: var(--ink); font-family: var(--font-display); font-size: 1.1rem; }
+
+/* ---------- family ---------- */
+.person { display: grid; gap: .8rem; padding-top: 1.2rem; border-top: 1px solid var(--line); }
+.person:first-child { border-top: 0; padding-top: 0; }
+.person-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: .6rem; }
+.person-head h3 { font-size: 1.4rem; font-weight: 700; overflow-wrap: anywhere; }
+.count { color: var(--muted); font-size: .92rem; }
+.you { font-size: .78rem; font-weight: 600; background: var(--ink); color: var(--bg); padding: .1rem .5rem; border-radius: 999px; }
+
+/* ---------- reveal ---------- */
+.envelope {
+  position: relative; border: 0; cursor: pointer; width: 100%; max-width: 560px; text-align: left;
+  border-radius: 16px; padding: 2.2rem 1.6rem; color: #F3F7F3; display: grid; gap: .5rem;
+  background:
+    linear-gradient(90deg, transparent calc(50% - 13px), var(--ribbon) calc(50% - 13px) calc(50% + 13px), transparent calc(50% + 13px)),
+    radial-gradient(circle at 12px 12px, rgba(255,255,255,.13) 2.2px, transparent 2.6px) 0 0 / 34px 34px,
+    repeating-linear-gradient(135deg, var(--pine) 0 22px, var(--pine-2) 22px 44px);
+}
+.envelope span { position: relative; background: rgba(10,25,20,.7); justify-self: start; padding: .3rem .7rem; border-radius: 8px; }
+.envelope .big { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.5rem, 4vw, 2rem); }
+.envelope:hover { filter: brightness(1.08); }
+.reveal-card { display: grid; gap: .4rem; }
+.reveal-card .label { color: var(--muted); }
+.reveal-card .name {
+  font-family: var(--font-display); font-weight: 800; font-size: clamp(2.4rem, 9vw, 4.5rem); letter-spacing: -.02em;
+  line-height: 1; overflow-wrap: anywhere; animation: pop .5s cubic-bezier(.2,1.4,.4,1) both;
+}
+@keyframes pop { from { transform: scale(.85) rotate(-3deg); opacity: .2; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .reveal-card .name { animation: none; } }
+
+/* ---------- organizer ---------- */
+.roster { display: grid; gap: .5rem; margin: 0; padding: 0; list-style: none; }
+.roster li { display: flex; align-items: center; gap: .75rem; padding: .6rem .8rem; background: var(--bg); border-radius: 8px; flex-wrap: wrap; }
+.roster .who { flex: 1 1 10rem; min-width: 0; font-weight: 600; overflow-wrap: anywhere; }
+.roster .n { color: var(--muted); font-size: .9rem; font-variant-numeric: tabular-nums; }
+.confirm { border: 1px solid var(--ribbon); border-radius: 10px; padding: 1rem; display: grid; gap: .7rem; background: var(--bg); }
+.offline { color: var(--danger); font-size: .92rem; }
+</style>
+</head>
+<body>
+
+<section class="hero" aria-label="Portada">
+  <div class="lights" id="lights" aria-hidden="true"></div>
+  <canvas id="snow" aria-hidden="true"></canvas>
+  <div class="wrap hero-grid">
+    <div>
+      <div class="tag-hero">
+        <h1>Amigo Secreto</h1>
+        <p class="sub">en familia, Navidad 2026</p>
+      </div>
+      <div class="hero-meta" id="hero-meta">
+        <span class="chip-dark" id="meta-people">Cargando la lista de la familia&hellip;</span>
+      </div>
+    </div>
+    <figure class="polaroid">
+      <img src="gifs/gato-chimenea.gif" alt="Un gatito con gorro de Papá Noel frente a la chimenea y el árbol de Navidad" width="320" height="320">
+      <figcaption>¡Feliz Navidad, familia!</figcaption>
+    </figure>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="authbar" id="authbar" hidden>
+    <img id="auth-photo" alt="" referrerpolicy="no-referrer" hidden>
+    <span id="auth-name"></span>
+    <button class="btn ghost small" type="button" id="btn-logout">Cerrar sesión</button>
+  </div>
+  <nav class="tabs" aria-label="Secciones">
+    <a href="#mi-lista" data-route="mi-lista">Mi lista</a>
+    <a href="#sorteo" data-route="sorteo">Mi amigo secreto</a>
+    <a href="#familia" data-route="familia">La familia</a>
+    <a href="#organizar" data-route="organizar" id="tab-org" hidden>Organizar</a>
+  </nav>
+
+  <main>
+    <p class="offline" id="offline" hidden>No se pudo conectar con la lista compartida todavía. Revisa tu conexión; la página se actualiza sola cuando vuelva.</p>
+
+    <div class="notice login" id="no-db" hidden>
+      <strong>Entra con tu cuenta de Google para participar</strong>
+      <p>Así tu lista queda guardada a tu nombre y solo tú puedes cambiarla. No publicamos nada en tu cuenta.</p>
+      <button class="btn-google" type="button" id="btn-login">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+        Entrar con Google
+      </button>
+      <p class="status" id="login-status" aria-live="polite"></p>
+    </div>
+
+    <div class="notice" id="setup-admin" hidden>
+      <strong>Falta definir quién organiza</strong>
+      <p>Si tú eres quien organiza, copia este código y pégalo en <code>firebase-config.js</code> (ADMIN_UIDS) y en las reglas de Firestore. Después recarga la página.</p>
+      <code class="uid" id="my-uid"></code>
+    </div>
+
+    <!-- MI LISTA -->
+    <section class="view" id="view-mi-lista" hidden>
+      <header>
+        <h2>Mi lista de regalos</h2>
+        <p class="lead">Escribe tu nombre y las cosas que te gustaría recibir. Agrega un comentario a cada una: talla, color, dónde se compra o lo que no te gusta. Quien te toque verá esta lista.</p>
+      </header>
+
+      <div class="notice" id="readonly-note" hidden>
+        <strong>Solo puedes mirar</strong>
+        <p>Tu acceso a esta página es de lectura. Pídele al organizador que te comparta la página como colaborador para escribir tu lista.</p>
+      </div>
+
+      <div class="panel" id="name-panel">
+        <div class="field">
+          <label for="my-name">Tu nombre</label>
+          <input type="text" id="my-name" maxlength="40" placeholder="Como te conoce la familia, por ejemplo: Tía Carmen" autocomplete="given-name">
+        </div>
+        <p class="status" id="name-status" aria-live="polite"></p>
+      </div>
+
+      <form class="panel" id="gift-form" novalidate>
+        <h3 id="form-title">Agregar un regalo</h3>
+        <div class="field">
+          <label for="g-idea">¿Qué te gustaría?</label>
+          <input type="text" id="g-idea" maxlength="80" placeholder="Por ejemplo: un libro de cocina peruana" required>
+        </div>
+        <fieldset class="choices" id="g-cat">
+          <legend class="legend">Tipo de regalo</legend>
+        </fieldset>
+        <fieldset class="choices" id="g-prio">
+          <legend class="legend">¿Cuánto lo quieres?</legend>
+        </fieldset>
+        <div class="field">
+          <label for="g-note">Comentario</label>
+          <textarea id="g-note" maxlength="400" placeholder="Talla M, ojalá en azul o verde. Lo venden en la feria del centro."></textarea>
+          <span class="hint">Lo que ayude a acertar: talla, color, marca, tienda, o lo que no quieres.</span>
+        </div>
+        <div class="field">
+          <label for="g-link">Enlace de ejemplo (opcional)</label>
+          <input type="url" id="g-link" maxlength="400" placeholder="https://…" inputmode="url">
+        </div>
+        <div class="actions">
+          <button class="btn" type="submit" id="g-submit">Agregar a mi lista</button>
+          <button class="btn ghost" type="button" id="g-cancel" hidden>Cancelar edición</button>
+          <span class="status" id="gift-status" aria-live="polite"></span>
+        </div>
+      </form>
+
+      <div id="my-tags"></div>
+    </section>
+
+    <!-- SORTEO -->
+    <section class="view" id="view-sorteo" hidden>
+      <header>
+        <h2>Mi amigo secreto</h2>
+        <p class="lead">Cuando el organizador haga el sorteo, aquí verás a quién le regalas y su lista. Nadie más ve a quién te tocó.</p>
+      </header>
+      <div id="reveal"></div>
+    </section>
+
+    <!-- FAMILIA -->
+    <section class="view" id="view-familia" hidden>
+      <header>
+        <h2>La lista de la familia</h2>
+        <p class="lead">Todas las listas, para inspirarte o para ver qué pidió cada uno. El sorteo no aparece aquí.</p>
+      </header>
+      <div id="family" class="view"></div>
+    </section>
+
+    <!-- ORGANIZAR -->
+    <section class="view" id="view-organizar" hidden>
+      <header>
+        <h2>Organizar el intercambio</h2>
+        <p class="lead">Solo tú ves esta sección. Define la fecha y el presupuesto, revisa quiénes se anotaron y haz el sorteo cuando estén todos.</p>
+      </header>
+      <form class="panel" id="config-form" novalidate>
+        <h3>Datos del intercambio</h3>
+        <div class="row2">
+          <div class="field">
+            <label for="c-date">Fecha del intercambio</label>
+            <input type="date" id="c-date">
+          </div>
+          <div class="field">
+            <label for="c-budget">Presupuesto por regalo</label>
+            <input type="text" id="c-budget" maxlength="40" placeholder="Por ejemplo: $20.000">
+          </div>
+        </div>
+        <div class="field">
+          <label for="c-note">Mensaje para la familia (opcional)</label>
+          <input type="text" id="c-note" maxlength="140" placeholder="Nos juntamos en la casa de la abuela a las 21:00">
+        </div>
+        <div class="actions">
+          <button class="btn" type="submit">Guardar datos</button>
+          <span class="status" id="config-status" aria-live="polite"></span>
+        </div>
+      </form>
+
+      <div class="panel">
+        <h3>Participantes</h3>
+        <ul class="roster" id="roster"></ul>
+        <div id="draw-area"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signInWithRedirect, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, collection, setDoc, deleteDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { FIREBASE_CONFIG, ADMIN_UIDS } from "./firebase-config.js";
+
+const app = initializeApp(FIREBASE_CONFIG);
+const auth = getAuth(app);
+const fs = getFirestore(app);
+
+// Small adapter so the page talks to Firestore with one simple shape.
+const wrapDoc = (s) => ({ id: s.id, exists: s.exists(), data: () => s.data(), metadata: s.metadata });
+const DB = {
+  doc(path) {
+    const r = doc(fs, path);
+    return {
+      set: (body) => setDoc(r, body),
+      delete: () => deleteDoc(r),
+      onSnapshot: (next, err) => onSnapshot(r, (s) => next(wrapDoc(s)), err),
+    };
+  },
+  collection(path) {
+    const r = collection(fs, path);
+    return {
+      get: async () => ({ docs: (await getDocs(r)).docs.map(wrapDoc) }),
+      onSnapshot: (next, err) => onSnapshot(r, (s) => next({ docs: s.docs.map(wrapDoc), metadata: s.metadata }), err),
+    };
+  },
+};
+
+(() => {
+  const CATS = ["Ropa y accesorios", "Libros", "Tecnología", "Hogar y cocina", "Juegos y juguetes", "Belleza y cuidado", "Comida y bebida", "Experiencias", "Deporte", "Otro"];
+  const PRIOS = [
+    { v: 3, label: "Lo que más quiero" },
+    { v: 2, label: "Me gustaría" },
+    { v: 1, label: "Una idea más" },
+  ];
+  const PRIO_LABEL = Object.fromEntries(PRIOS.map(p => [p.v, p.label]));
+  const ROUTES = ["mi-lista", "sorteo", "familia", "organizar"];
+
+  const $ = (id) => document.getElementById(id);
+  function h(tag, attrs, ...kids) {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (v == null || v === false) continue;
+      if (k === "class") el.className = v;
+      else if (k === "text") el.textContent = v;
+      else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? "" : v);
+    }
+    for (const c of kids.flat()) {
+      if (c == null || c === false) continue;
+      el.append(c.nodeType ? c : document.createTextNode(String(c)));
+    }
+    return el;
+  }
+
+  const S = {
+    db: null, user: null, myId: null, isOwner: false, canWrite: true,
+    people: new Map(), config: {}, myAssign: null, assignLoaded: false,
+    mine: null, mineLoaded: false, editingId: null, revealed: false, confirmDraw: false,
+    confirmRemove: null, drawing: false, loaded: false,
+  };
+
+  // ---------- choices ----------
+  CATS.forEach((c, i) => $("g-cat").append(h("label", { class: "choice" },
+    h("input", { type: "radio", name: "g-cat", id: "g-cat-" + i, value: c, checked: i === 0 }), h("span", { text: c }))));
+  PRIOS.forEach((p) => $("g-prio").append(h("label", { class: "choice" },
+    h("input", { type: "radio", name: "g-prio", id: "g-prio-" + p.v, value: String(p.v), checked: p.v === 2 }), h("span", { text: p.label }))));
+
+  // ---------- routing ----------
+  function route() {
+    let r = (location.hash || "").slice(1);
+    if (!ROUTES.includes(r) || (r === "organizar" && !S.isOwner)) r = "mi-lista";
+    ROUTES.forEach(x => { $("view-" + x).hidden = x !== r || !S.db; });
+    document.querySelectorAll("nav.tabs a").forEach(a => {
+      if (a.dataset.route === r) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+    });
+  }
+  window.addEventListener("hashchange", route);
+
+  // ---------- helpers ----------
+  const named = () => [...S.people.entries()].filter(([, p]) => (p.nombre || "").trim()).sort((a, b) => a[1].nombre.localeCompare(b[1].nombre, "es"));
+  const gifts = (p) => Array.isArray(p && p.regalos) ? p.regalos : [];
+  function fmtDate(iso) {
+    if (!iso) return "";
+    const d = new Date(iso + "T12:00:00");
+    if (isNaN(d)) return "";
+    return d.toLocaleDateString("es", { weekday: "long", day: "numeric", month: "long" });
+  }
+  function catNote(src, alt, title, text, cls) {
+    return h("div", { class: (cls || "empty") + " cat-note" },
+      h("img", { src: "gifs/" + src, alt, width: "140", height: "140", loading: "lazy" }),
+      h("div", {}, h("strong", { text: title }), h("span", { text })));
+  }
+  function daysLeft() {
+    const target = S.config.fecha ? new Date(S.config.fecha + "T00:00:00") : new Date(new Date().getFullYear(), 11, 24);
+    if (isNaN(target)) return null;
+    const now = new Date(); now.setHours(0, 0, 0, 0);
+    return { n: Math.round((target - now) / 86400000), what: S.config.fecha ? "el intercambio" : "Nochebuena" };
+  }
+  function setStatus(id, msg, kind) { const el = $(id); el.textContent = msg || ""; el.className = "status" + (kind ? " " + kind : ""); }
+
+  // one write at a time for my own document
+  let chain = Promise.resolve();
+  function saveMine() {
+    if (!S.db || !S.myId) return Promise.resolve();
+    const body = { nombre: (S.mine.nombre || "").trim(), regalos: S.mine.regalos, actualizado: Date.now() };
+    chain = chain.then(() => S.db.doc("participantes/" + S.myId).set(body));
+    return chain.catch((e) => {
+      chain = Promise.resolve();
+      if (e && e.code === "permission-denied") { S.canWrite = false; renderMine(); }
+      throw e;
+    });
+  }
+
+  // ---------- render: hero meta ----------
+  function renderMeta() {
+    const box = $("hero-meta"); box.replaceChildren();
+    const n = named().length;
+    if (!S.db) { box.append(h("span", { class: "chip-dark", text: "Inicia sesión para ver la lista" })); return; }
+    const dl = daysLeft();
+    if (dl && dl.n > 0) box.append(h("span", { class: "chip-dark" }, "Faltan ", h("strong", { text: dl.n + (dl.n === 1 ? " día" : " días") }), " para " + dl.what));
+    else if (dl && dl.n === 0) box.append(h("span", { class: "chip-dark" }, h("strong", { text: "¡Hoy es " + dl.what + "!" })));
+    box.append(h("span", { class: "chip-dark" }, h("strong", { text: n }), n === 1 ? " persona anotada" : " personas anotadas"));
+    if (S.config.fecha) box.append(h("span", { class: "chip-dark" }, "Intercambio: ", h("strong", { text: fmtDate(S.config.fecha) })));
+    if (S.config.presupuesto) box.append(h("span", { class: "chip-dark" }, "Presupuesto: ", h("strong", { text: S.config.presupuesto })));
+    if (S.config.sorteado) box.append(h("span", { class: "chip-dark" }, h("strong", { text: "Sorteo hecho" })));
+    if (S.config.mensaje) box.append(h("span", { class: "chip-dark", text: S.config.mensaje }));
+  }
+
+  // ---------- gift tag ----------
+  function giftTag(g, opts = {}) {
+    const prio = Number(g.prioridad) || 2;
+    const link = typeof g.enlace === "string" && g.enlace.startsWith("https://") ? g.enlace : null;
+    let host = "";
+    if (link) { try { host = new URL(link).hostname.replace(/^www\./, ""); } catch (_) { host = "Ver ejemplo"; } }
+    return h("article", { class: "gift" },
+      h("h4", { text: g.idea || "Sin título" }),
+      h("div", { class: "meta" },
+        h("span", { class: "pill p" + prio, text: PRIO_LABEL[prio] || "Me gustaría" }),
+        g.categoria ? h("span", { class: "pill", text: g.categoria }) : null),
+      g.comentario ? h("p", { class: "note", text: g.comentario }) : null,
+      link ? h("a", { class: "link", href: link, target: "_blank", rel: "noopener noreferrer", text: "Ver ejemplo en " + host }) : null,
+      opts.editable ? h("div", { class: "tools" },
+        h("button", { class: "btn ghost small", type: "button", onclick: () => startEdit(g.id), text: "Editar" }),
+        h("button", { class: "btn ghost small", type: "button", onclick: () => removeGift(g.id), text: "Quitar" })) : null);
+  }
+  const sortGifts = (arr) => [...arr].sort((a, b) => (Number(b.prioridad) || 2) - (Number(a.prioridad) || 2));
+
+  // ---------- render: my list ----------
+  function renderMine() {
+    $("readonly-note").hidden = S.canWrite;
+    $("gift-form").hidden = !S.canWrite;
+    $("my-name").disabled = !S.canWrite;
+    const box = $("my-tags"); box.replaceChildren();
+    if (!S.mineLoaded) { box.append(h("p", { class: "hint", text: "Cargando tu lista…" })); return; }
+    const list = gifts(S.mine);
+    if (!list.length) {
+      box.append(catNote("gatito-nieve.gif", "Un gatito con gorro de Papá Noel en la nieve",
+        "Tu lista está vacía",
+        "Agrega al menos tres ideas, así quien te toque tiene de dónde elegir."));
+      return;
+    }
+    box.append(h("div", { class: "person-head" }, h("h3", { text: "Lo que pediste" }),
+      h("span", { class: "count", text: list.length + (list.length === 1 ? " regalo" : " regalos") })));
+    box.append(h("div", { class: "tags" }, sortGifts(list).map(g => giftTag(g, { editable: S.canWrite }))));
+  }
+
+  // ---------- render: family ----------
+  function renderFamily() {
+    const box = $("family"); box.replaceChildren();
+    const list = named();
+    if (!S.loaded) { box.append(h("p", { class: "hint", text: "Cargando las listas…" })); return; }
+    if (!list.length) {
+      box.append(catNote("gato-arbol.gif", "Un gato frente a un árbol de Navidad",
+        "Todavía nadie escribió su lista",
+        "Empieza tú en Mi lista y comparte la página con la familia."));
+      return;
+    }
+    list.forEach(([id, p]) => {
+      const g = gifts(p);
+      box.append(h("section", { class: "person" },
+        h("div", { class: "person-head" },
+          h("h3", { text: p.nombre }),
+          id === S.myId ? h("span", { class: "you", text: "Tú" }) : null,
+          h("span", { class: "count", text: g.length ? g.length + (g.length === 1 ? " regalo" : " regalos") : "Aún sin regalos" })),
+        g.length ? h("div", { class: "tags" }, sortGifts(g).map(x => giftTag(x))) : null));
+    });
+  }
+
+  // ---------- render: reveal ----------
+  function renderReveal() {
+    const box = $("reveal"); box.replaceChildren();
+    if (!S.loaded || !S.assignLoaded) { box.append(h("p", { class: "hint", text: "Cargando…" })); return; }
+    const n = named().length;
+    if (!S.config.sorteado) {
+      box.append(catNote("gato-trineo.gif", "Un gato vestido de Papá Noel en un trineo tirado por gatitos con cuernos de reno",
+        "El trineo todavía se está preparando",
+        `Van ${n} ${n === 1 ? "persona anotada" : "personas anotadas"}. El organizador hará el sorteo cuando estén todos. Mientras, completa tu lista.`, "notice"));
+      return;
+    }
+    const to = S.myAssign && S.myAssign.para;
+    const p = to && S.people.get(to);
+    if (!to || !p) {
+      box.append(h("div", { class: "notice" }, h("strong", { text: "No apareces en este sorteo" }),
+        h("p", { text: "Probablemente te anotaste después de que se hizo. Pídele al organizador que lo repita." })));
+      return;
+    }
+    if (!S.revealed) {
+      box.append(h("button", { class: "envelope", type: "button", onclick: () => { S.revealed = true; renderReveal(); } },
+        h("span", { class: "big", text: "Tu regalo está envuelto" }),
+        h("span", { text: "Toca para ver a quién le regalas. Mira que no haya nadie al lado." })));
+      return;
+    }
+    const g = gifts(p);
+    box.append(h("div", { class: "reveal-card" },
+      h("div", { class: "reveal-top" },
+        h("img", { src: "gifs/gato-gorro.gif", alt: "Un gato blanco con gorro de Papá Noel", width: "150", height: "150" }),
+        h("div", { class: "reveal-card" },
+          h("p", { class: "label", text: "Te tocó regalarle a" }),
+          h("p", { class: "name", text: p.nombre }))),
+      S.config.presupuesto ? h("p", { class: "label", text: "Presupuesto: " + S.config.presupuesto + (S.config.fecha ? ". Intercambio el " + fmtDate(S.config.fecha) + "." : "") }) : null,
+      h("div", { class: "actions" }, h("button", { class: "btn ghost small", type: "button", onclick: () => { S.revealed = false; renderReveal(); }, text: "Volver a esconder" }))));
+    box.append(g.length
+      ? h("div", { class: "tags" }, sortGifts(g).map(x => giftTag(x)))
+      : h("div", { class: "empty" }, h("strong", { text: p.nombre + " todavía no agrega regalos" }), h("span", { text: "Vuelve más tarde; la lista se actualiza sola." })));
+  }
+
+  // ---------- render: organizer ----------
+  function renderOrg() {
+    $("tab-org").hidden = !S.isOwner;
+    if (!S.isOwner) return;
+    const roster = $("roster"); roster.replaceChildren();
+    const all = [...S.people.entries()].sort((a, b) => (a[1].nombre || "").localeCompare(b[1].nombre || "", "es"));
+    if (!all.length) roster.append(h("li", {}, h("span", { class: "who", text: "Nadie se ha anotado todavía. Comparte la página con la familia como colaboradores." })));
+    all.forEach(([id, p]) => {
+      const g = gifts(p).length;
+      const li = h("li", {},
+        h("span", { class: "who", text: (p.nombre || "").trim() || "Sin nombre (no entra al sorteo)" }),
+        h("span", { class: "n", text: g + (g === 1 ? " regalo" : " regalos") }));
+      if (id === S.myId) li.append(h("span", { class: "you", text: "Tú" }));
+      else if (S.confirmRemove === id) {
+        li.append(h("button", { class: "btn danger small", type: "button", onclick: () => removePerson(id), text: "Sí, quitar" }),
+          h("button", { class: "btn ghost small", type: "button", onclick: () => { S.confirmRemove = null; renderOrg(); }, text: "No" }));
+      } else li.append(h("button", { class: "btn ghost small", type: "button", onclick: () => { S.confirmRemove = id; renderOrg(); }, text: "Quitar" }));
+      roster.append(li);
+    });
+
+    const area = $("draw-area"); area.replaceChildren();
+    const n = named().length;
+    const status = h("p", { class: "status", id: "draw-status", "aria-live": "polite" });
+    if (n < 3) {
+      area.append(h("p", { class: "hint", text: `Se necesitan al menos 3 personas con nombre para sortear. Van ${n}.` }));
+      return;
+    }
+    if (!S.confirmDraw) {
+      area.append(h("div", { class: "actions" },
+        h("button", { class: "btn", type: "button", onclick: () => { S.confirmDraw = true; renderOrg(); },
+          text: S.config.sorteado ? "Repetir el sorteo" : `Hacer el sorteo entre ${n}` }),
+        S.config.sorteado ? h("span", { class: "hint", text: "Ya hay un sorteo. Repetirlo cambia a quién le toca cada uno." }) : null), status);
+      return;
+    }
+    area.append(h("div", { class: "confirm" },
+      h("strong", { text: S.config.sorteado ? "¿Repetir el sorteo?" : "¿Hacer el sorteo ahora?" }),
+      h("p", { text: `Cada una de las ${n} personas recibirá a alguien distinto de sí misma. ${S.config.sorteado ? "Las asignaciones anteriores se reemplazan; avisa a la familia." : "Quien se anote después no quedará incluido."}` }),
+      h("div", { class: "actions" },
+        h("button", { class: "btn", type: "button", disabled: S.drawing, onclick: runDraw, text: S.drawing ? "Sorteando…" : "Sí, sortear" }),
+        h("button", { class: "btn ghost", type: "button", disabled: S.drawing, onclick: () => { S.confirmDraw = false; renderOrg(); }, text: "Cancelar" }))), status);
+  }
+
+  function renderAll() { renderMeta(); renderMine(); renderFamily(); renderReveal(); renderOrg(); route(); }
+
+  // ---------- my list actions ----------
+  let nameTimer = null;
+  $("my-name").addEventListener("input", () => {
+    if (!S.mine) return;
+    S.mine.nombre = $("my-name").value.slice(0, 40);
+    setStatus("name-status", "Guardando…");
+    clearTimeout(nameTimer);
+    nameTimer = setTimeout(async () => {
+      try { await saveMine(); setStatus("name-status", "Nombre guardado", "ok"); }
+      catch (e) { setStatus("name-status", "No se pudo guardar tu nombre. Revisa tu conexión e inténtalo otra vez.", "err"); }
+    }, 700);
+  });
+
+  function readForm() {
+    return {
+      idea: $("g-idea").value.trim().slice(0, 80),
+      categoria: (document.querySelector('input[name="g-cat"]:checked') || {}).value || "Otro",
+      prioridad: Number((document.querySelector('input[name="g-prio"]:checked') || {}).value || 2),
+      comentario: $("g-note").value.trim().slice(0, 400),
+      enlace: $("g-link").value.trim().slice(0, 400),
+    };
+  }
+  function resetForm() {
+    $("gift-form").reset();
+    $("g-cat-0").checked = true; $("g-prio-2").checked = true;
+    S.editingId = null;
+    $("form-title").textContent = "Agregar un regalo";
+    $("g-submit").textContent = "Agregar a mi lista";
+    $("g-cancel").hidden = true;
+  }
+  $("g-cancel").addEventListener("click", () => { resetForm(); setStatus("gift-status", ""); });
+
+  $("gift-form").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    if (!S.mine) return;
+    const f = readForm();
+    if (!(S.mine.nombre || "").trim()) { setStatus("gift-status", "Escribe tu nombre arriba primero, así la familia sabe de quién es la lista.", "err"); $("my-name").focus(); return; }
+    if (!f.idea) { setStatus("gift-status", "Escribe qué regalo te gustaría.", "err"); $("g-idea").focus(); return; }
+    if (f.enlace && !f.enlace.startsWith("https://")) { setStatus("gift-status", "El enlace debe empezar con https://", "err"); $("g-link").focus(); return; }
+    const editing = S.editingId;
+    if (editing) S.mine.regalos = S.mine.regalos.map(g => g.id === editing ? { ...g, ...f } : g);
+    else {
+      if (S.mine.regalos.length >= 30) { setStatus("gift-status", "Llegaste al máximo de 30 regalos. Quita alguno para agregar otro.", "err"); return; }
+      S.mine.regalos = [...S.mine.regalos, { id: "g" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), ...f }];
+    }
+    renderMine();
+    setStatus("gift-status", "Guardando…");
+    try {
+      await saveMine();
+      resetForm();
+      setStatus("gift-status", editing ? "Cambios guardados" : "Agregado a tu lista", "ok");
+      renderMine(); renderFamily();
+    } catch (e) {
+      setStatus("gift-status", "No se pudo guardar. Revisa tu conexión e inténtalo otra vez.", "err");
+    }
+  });
+
+  function startEdit(id) {
+    const g = S.mine.regalos.find(x => x.id === id); if (!g) return;
+    S.editingId = id;
+    $("g-idea").value = g.idea || ""; $("g-note").value = g.comentario || ""; $("g-link").value = g.enlace || "";
+    const ci = CATS.indexOf(g.categoria); $("g-cat-" + (ci >= 0 ? ci : CATS.length - 1)).checked = true;
+    const pr = $("g-prio-" + (Number(g.prioridad) || 2)); if (pr) pr.checked = true;
+    $("form-title").textContent = "Editar regalo";
+    $("g-submit").textContent = "Guardar cambios";
+    $("g-cancel").hidden = false;
+    setStatus("gift-status", "");
+    $("gift-form").scrollIntoView({ behavior: "smooth", block: "start" });
+    $("g-idea").focus({ preventScroll: true });
+  }
+  async function removeGift(id) {
+    S.mine.regalos = S.mine.regalos.filter(g => g.id !== id);
+    if (S.editingId === id) resetForm();
+    renderMine();
+    try { await saveMine(); setStatus("gift-status", "Regalo quitado", "ok"); renderFamily(); }
+    catch (e) { setStatus("gift-status", "No se pudo quitar. Revisa tu conexión e inténtalo otra vez.", "err"); }
+  }
+
+  // ---------- organizer actions ----------
+  $("config-form").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const body = { ...S.config, fecha: $("c-date").value || "", presupuesto: $("c-budget").value.trim().slice(0, 40), mensaje: $("c-note").value.trim().slice(0, 140) };
+    setStatus("config-status", "Guardando…");
+    try { await S.db.doc("config/juego").set(body); setStatus("config-status", "Datos guardados", "ok"); }
+    catch (e) { setStatus("config-status", "No se pudieron guardar los datos. Inténtalo otra vez.", "err"); }
+  });
+
+  async function removePerson(id) {
+    S.confirmRemove = null;
+    try { await S.db.doc("participantes/" + id).delete(); }
+    catch (e) { /* the roster re-renders from the store */ }
+    renderOrg();
+  }
+
+  async function runDraw() {
+    if (S.drawing) return;
+    S.drawing = true; renderOrg();
+    const ids = named().map(([id]) => id);
+    for (let i = ids.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [ids[i], ids[j]] = [ids[j], ids[i]];
+    }
+    const ronda = (Number(S.config.ronda) || 0) + 1;
+    try {
+      const old = await S.db.collection("sorteo").get();
+      const keep = new Set(ids);
+      for (const d of old.docs) if (!keep.has(d.id)) await S.db.doc("sorteo/" + d.id).delete();
+      for (let i = 0; i < ids.length; i++) {
+        await S.db.doc("sorteo/" + ids[i]).set({ para: ids[(i + 1) % ids.length], ronda });
+      }
+      await S.db.doc("config/juego").set({ ...S.config, sorteado: true, ronda, sorteadoEl: Date.now() });
+      S.drawing = false; S.confirmDraw = false; S.revealed = false;
+      renderOrg();
+      setStatus("draw-status", `Sorteo listo. Cada uno ve a quién le toca en Mi amigo secreto.`, "ok");
+    } catch (e) {
+      S.drawing = false; renderOrg();
+      setStatus("draw-status", "El sorteo no se completó. Inténtalo otra vez; se rehace entero.", "err");
+    }
+  }
+
+  // ---------- boot ----------
+  async function start() {
+    route();
+    renderMine(); renderFamily(); renderReveal();
+    $("btn-login").addEventListener("click", async () => {
+      setStatus("login-status", "Abriendo Google…");
+      try { await signInWithPopup(auth, new GoogleAuthProvider()); setStatus("login-status", ""); }
+      catch (e) {
+        if (e && (e.code === "auth/popup-blocked" || e.code === "auth/operation-not-supported-in-this-environment")) {
+          signInWithRedirect(auth, new GoogleAuthProvider());
+        } else if (e && e.code === "auth/popup-closed-by-user") setStatus("login-status", "Cerraste la ventana de Google antes de terminar. Inténtalo otra vez.", "err");
+        else if (e && e.code === "auth/unauthorized-domain") setStatus("login-status", "Este sitio no está autorizado en Firebase. El organizador debe agregarlo en Authentication > Settings > Authorized domains.", "err");
+        else setStatus("login-status", "No se pudo entrar con Google. Inténtalo otra vez.", "err");
+      }
+    });
+    $("btn-logout").addEventListener("click", async () => { await signOut(auth); location.reload(); });
+
+    let booted = false;
+    onAuthStateChanged(auth, (u) => {
+      if (!u) { showNoDb(); return; }
+      if (booted) return;
+      booted = true;
+      $("no-db").hidden = true;
+      $("authbar").hidden = false;
+      $("auth-name").textContent = u.displayName || u.email || "Conectado";
+      if (u.photoURL && u.photoURL.startsWith("https://")) { $("auth-photo").src = u.photoURL; $("auth-photo").hidden = false; }
+      if (!ADMIN_UIDS.length || ADMIN_UIDS.some(x => /PEGA/.test(x))) { $("setup-admin").hidden = false; $("my-uid").textContent = u.uid; }
+      boot(u);
+    });
+  }
+
+  function boot(u) {
+    const db = DB;
+    S.db = db;
+    S.myId = u.uid;
+    S.isOwner = ADMIN_UIDS.includes(u.uid);
+    S.canWrite = true;
+    S.googleName = (u.displayName || "").split(" ")[0];
+    renderAll();
+
+    const timer = setTimeout(() => { $("offline").hidden = false; }, 10000);
+    db.collection("participantes").onSnapshot((snap) => {
+      S.people = new Map(snap.docs.map(d => [d.id, d.data() || {}]));
+      if (!snap.metadata.fromCache) { clearTimeout(timer); $("offline").hidden = true; S.loaded = true; }
+      if (!S.mineLoaded && (!snap.metadata.fromCache || S.people.has(S.myId))) {
+        const m = S.people.get(S.myId) || {};
+        S.mine = { nombre: m.nombre || S.googleName || "", regalos: gifts(m).map(g => ({ ...g })) };
+        S.mineLoaded = true;
+        if (document.activeElement !== $("my-name")) $("my-name").value = S.mine.nombre;
+      }
+      S.loaded = S.loaded || snap.docs.length > 0;
+      renderAll();
+    }, () => { clearTimeout(timer); $("offline").hidden = false; });
+
+    db.doc("config/juego").onSnapshot((d) => {
+      S.config = d.exists ? (d.data() || {}) : {};
+      if (S.isOwner) {
+        if (document.activeElement !== $("c-date")) $("c-date").value = S.config.fecha || "";
+        if (document.activeElement !== $("c-budget")) $("c-budget").value = S.config.presupuesto || "";
+        if (document.activeElement !== $("c-note")) $("c-note").value = S.config.mensaje || "";
+      }
+      renderAll();
+    }, () => {});
+
+    db.doc("sorteo/" + S.myId).onSnapshot((d) => {
+      const next = d.exists ? (d.data() || null) : null;
+      if (!S.myAssign || !next || S.myAssign.para !== next.para) S.revealed = false;
+      S.myAssign = next; S.assignLoaded = true;
+      renderReveal();
+    }, () => { S.assignLoaded = true; renderReveal(); });
+  }
+
+  function showNoDb() {
+    $("no-db").hidden = false;
+    $("authbar").hidden = true;
+    ROUTES.forEach(x => { $("view-" + x).hidden = true; });
+    renderMeta();
+  }
+
+  // ---------- lights + snow ----------
+  const BULBS = ["#FF4D5E", "#FFD15C", "#4ADE80", "#5CC8FF", "#FF9F45"];
+  for (let i = 0; i < 40; i++) {
+    const b = document.createElement("i");
+    b.style.setProperty("--c", BULBS[i % BULBS.length]);
+    b.style.setProperty("--d", ((i * 0.37) % 1.8).toFixed(2) + "s");
+    $("lights").append(b);
+  }
+  (function snow() {
+    const cv = $("snow"); const ctx = cv.getContext && cv.getContext("2d");
+    if (!ctx || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let W = 0, H = 0, flakes = [];
+    function size() {
+      const r = cv.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
+      W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const n = Math.round(W * H / 9000);
+      flakes = Array.from({ length: n }, () => ({ x: Math.random() * W, y: Math.random() * H, r: .8 + Math.random() * 2.4, s: .3 + Math.random() * .9, w: Math.random() * 6.28 }));
+    }
+    size(); addEventListener("resize", size);
+    (function tick() {
+      ctx.clearRect(0, 0, W, H); ctx.fillStyle = "rgba(255,255,255,.85)";
+      for (const f of flakes) {
+        f.y += f.s; f.w += .01; f.x += Math.sin(f.w) * .35;
+        if (f.y > H + 4) { f.y = -4; f.x = Math.random() * W; }
+        ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, 6.283); ctx.fill();
+      }
+      requestAnimationFrame(tick);
+    })();
+  })();
+
+  start();
+})();
+</script>
+</body>
+</html>
